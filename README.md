@@ -1,0 +1,1 @@
+Se inicia las actividades de repaso sobre python
