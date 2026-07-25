@@ -1,3 +1,2 @@
-print ('Buenaas', 'Seguidores de la grasa.', end='Hasta nunca')
-
-print (' ','Sam','Santiago','maria',' ', sep='***', end='in...Python')
+print ('Buenaas', 'Seguidores de la grasa.', end='Hasta nunca tonotonos. \n')
+print ('Sam\nSantiago\nmaria',' ',' ', sep='***', end='in...Python')
