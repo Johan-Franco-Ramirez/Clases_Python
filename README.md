@@ -6,3 +6,4 @@ Se inicia las actividades de cadenas
 
 Se terminan las actividades sobre cadenas y literales de python
 
+Se inician las actividades de usos de operadores
