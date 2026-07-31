@@ -115,3 +115,4 @@ El proyecto fue desarrollado como evidencia de aprendizaje de la actividad del c
 ## Reflexion
 
 En estos 5 modulos aprendi que las funciones que guardan informacion pueden resultar muy utiles y no todas funcionan igual, todo depende a que se quiera aplicar y que quiere solucionar cada uno, tambien reforce cosas de python y aunque no use todos los comando enseñados en los ejercicios o retos intente aplicar los mas necesarios y que a mi me parecian más importantes, puesto que son los que mas podria a llegar a utilizar como los de add, remove, for x in, etc.
+Tambien siento que he aprendido bastantes cosas de las que no tenia un buen manejo.
