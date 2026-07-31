@@ -18,3 +18,7 @@ Se termino el reto 1 en la carpeta condicionales, se crean los otros archivos y 
 
 Se termino el reto 2 de la actividad en la carpeta de los iterativos, se inicia con el reto 3
 
+Se finaliza el reto 3
+
+Se inicia la actividad nueva en una sub-carpeta propia
+
