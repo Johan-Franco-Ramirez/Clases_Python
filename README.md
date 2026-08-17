@@ -1,11 +1,11 @@
 # Fundamentos de Programación en Python
 
 Proyecto de estudio que agrupa **todas las actividades realizadas en clase**.  
-Incluye ejercicios delogica, fundamentos, Programación Orientada a Objetos (POO) y estructuras de datos en Python.
+Incluye ejercicios de lógica, fundamentos, Programación Orientada a Objetos (POO) y estructuras de datos en Python.
 
 ---
 
-##  Objetivos del proyecto
+## 🎯 Objetivos del proyecto
 
 - Practicar los conceptos básicos de Python
 - Aplicar Programación Orientada a Objetos (POO)
@@ -15,15 +15,42 @@ Incluye ejercicios delogica, fundamentos, Programación Orientada a Objetos (POO
 
 ---
 
-##  Estructura del proyecto
-src/
+## 📂 Estructura del proyecto
 
-├── actividad1/                 # Primera actividad de clase
+```text
+FUNDAMENTOS_PYTHON/
+├── sistema_usuarios/          # Módulo de gestión de usuarios
+└── src/
+    ├── Clase1_IntroduccionPython/
+    |   ├──seccion1
+    |   |   ├── LAB_FormatoSalida.py
+    |   |   ├──LAB_FuncionPrint.py
+    |   |   └──LAB_PrintArgumentos.py
+    |   ├──seccion2
+    |   |   └──LAB_literalesCadenas.py
+    |   ├──seccion3
+    |   └──LAB_EjerciciosOperadores.py
+    |   ├──seccion4
+    |       ├──LAB_Convertidor.py
+    |       ├──LAB_Gameplay.py
+    |       ├──LAB_Operadores.py
+    |       └──LAB_Variables.py
+    ├── Clase2Fundamentos/
+    │   ├── condicionales/
+    │   ├── funciones/
+    │   └── iterativas/
+    ├── Clase3_EstructuraDatos/
+    │   ├── modulo1_listas/
+    │   ├── modulo2_tuplas/
+    │   ├── modulo3_diccionarios/
+    │   ├── modulo4_conjuntos/
+    │   └── modulo5comprehensions/
+    └── PooEnPython/
+        ├── EjemplosPOO/
+        ├── RetoPOO/
+        └── TalleresPOO/
+└──README.md
+```
 
-├── actividad2/                 # Segunda actividad de clase
-
-├── PooEnPython/              # Ejercicios de Programación Orientada a Objetos
-
-└── python_estructuras_datos/   # Ejercicios de estructuras de datos
 ---
-## Johan Franco R. ADSO 
+# Johan Franco R. ADSO.
