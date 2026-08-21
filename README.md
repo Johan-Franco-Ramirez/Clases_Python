@@ -19,22 +19,20 @@ Incluye ejercicios de lógica, fundamentos, Programación Orientada a Objetos (P
 
 ```text
 FUNDAMENTOS_PYTHON/
-├── sistema_usuarios/          # Módulo de gestión de usuarios
+├── device_systems/           # Reto Integrador: API REST de usuarios (FastAPI)
+│   ├── app/
+│   │   ├── routes/           # Endpoints GET y POST
+│   │   ├── schemas/          # Modelos de validación Pydantic
+│   │   └── main.py           # Archivo principal de FastAPI
+│   ├── requirements.txt
+│   └── README.md
+├── sistema_usuarios/         # Módulo previo de gestión de usuarios
 └── src/
     ├── Clase1_IntroduccionPython/
-    |   ├──seccion1
-    |   |   ├── LAB_FormatoSalida.py
-    |   |   ├──LAB_FuncionPrint.py
-    |   |   └──LAB_PrintArgumentos.py
-    |   ├──seccion2
-    |   |   └──LAB_literalesCadenas.py
-    |   ├──seccion3
-    |   └──LAB_EjerciciosOperadores.py
-    |   ├──seccion4
-    |       ├──LAB_Convertidor.py
-    |       ├──LAB_Gameplay.py
-    |       ├──LAB_Operadores.py
-    |       └──LAB_Variables.py
+    │   ├── seccion1
+    │   ├── seccion2
+    │   ├── seccion3
+    │   └── seccion4
     ├── Clase2Fundamentos/
     │   ├── condicionales/
     │   ├── funciones/
@@ -49,7 +47,7 @@ FUNDAMENTOS_PYTHON/
         ├── EjemplosPOO/
         ├── RetoPOO/
         └── TalleresPOO/
-└──README.md
+└── README.md
 ```
 
 ---
