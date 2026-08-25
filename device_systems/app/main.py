@@ -8,12 +8,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Conectar el enrutador de usuarios a la app
+# Conectar el enrutador de usuarios
 app.include_router(user_routes.router)
 
-# Ruta raíz informativa
 @app.get("/")
 def read_root():
+    # Ruta raíz informativa
     return {
         "mensaje": "Bienvenido a device_systems API",
         "documentacion": "/docs"
