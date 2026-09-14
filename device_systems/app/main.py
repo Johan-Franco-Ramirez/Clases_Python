@@ -1,20 +1,11 @@
 from fastapi import FastAPI
-from app.routes import user_routes
+from app.data.connection import engine, Base
+from app.routes.user_routes import router
 
-# Inicializar la aplicación principal de FastAPI
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
-    title="device_systems API",
-    description="API REST para la gestión de usuarios del sistema device_systems.",
-    version="1.0.0"
+    title="Sistema de gestion usuarios device_systems"
 )
 
-# Conectar el enrutador de usuarios
-app.include_router(user_routes.router)
-
-@app.get("/")
-def read_root():
-    # Ruta raíz informativa
-    return {
-        "mensaje": "Bienvenido a device_systems API",
-        "documentacion": "/docs"
-    }
+app.include_router(router)

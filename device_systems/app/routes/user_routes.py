@@ -1,130 +1,157 @@
-from typing_extensions import Literal
-from fastapi import APIRouter, HTTPException, status, Response
 from typing import List, Optional
-from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from app.dependencies.database_dependency import get_db
 from app.services import user_service
+from app.schemas.user_schema import (
+    userCreate,
+    userUpdate,
+    userPatch,
+    userResponse
+)
 
-# Agrupar endpoints de usuarios bajo el prefijo /users
-router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.get("/", response_model=List[UserResponse])
-def get_users(
-    response: Response,
-    role: Optional[Literal["admin", "support", "user"]] = None,
-    is_active: Optional[bool] = None
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"]
+)
+
+
+@router.get(
+    "/",
+    response_model=List[userResponse]
+)
+def obtener_usuarios(
+    db: Session = Depends(get_db),
+    role: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    name: Optional[str] = None,
+    email: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    order: str = "asc"
 ):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
-
-    users = user_service.get_all_users()
-
-    # Filtrar por rol si se especifica
-    if role:
-        users = [u for u in users if u["role"] == role]
-        
-    # Filtrar por estado activo si se especifica
-    if is_active is not None:
-        users = [u for u in users if u["is_active"] == is_active]
-
-    return users
+    return user_service.obtener_usuarios(
+        db=db,
+        role=role,
+        is_active=is_active,
+        name=name,
+        email=email,
+        sort_by=sort_by,
+        order=order
+    )
 
 
-@router.get("/{user_id}", response_model=UserResponse)
-def get_user_by_id(user_id: int, response: Response):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
+@router.get(
+    "/{user_id}",
+    response_model=userResponse
+)
+def obtener_usuario(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    usuario = user_service.obtener_usuario(db, user_id)
 
-    # Buscar usuario por ID o lanzar error 404
-    user = user_service.get_user_by_id(user_id)
-    if not user:
+    if usuario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"El usuario con ID {user_id} no existe."
+            detail="Usuario no encontrado"
         )
-    return user
+
+    return usuario
 
 
-@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user_data: UserCreate, response: Response):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
-
-    # Evitar correos duplicados consultando el servicio
-    existing_users = user_service.get_all_users()
-    for existing in existing_users:
-        if existing["email"] == user_data.email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El correo electrónico ya se encuentra registrado."
-            )
-
-    # Crear y retornar el nuevo usuario
-    new_user = user_service.create_user(user_data.model_dump())
-    return new_user
-
-
-@router.put("/{user_id}", response_model=UserResponse)
-def update_user_complete(user_id: int, user_data: UserCreate, response: Response):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
-
-    # Reemplazar completamente los datos del usuario por ID
-    updated_user = user_service.update_user(user_id, user_data.model_dump())
-    if not updated_user:
+@router.post("/",
+             response_model=userResponse,
+             status_code=status.HTTP_201_CREATED)
+def crear_usuario(
+    usuario_data: userCreate,
+    db: Session = Depends(get_db)
+):
+    try:
+        return user_service.crear_usuario(db, usuario_data)
+    except IntegrityError:
+        db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"El usuario con ID {user_id} no existe."
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El correo electrónico ya está registrado"
         )
-    return updated_user
-
-
-@router.patch("/{user_id}", response_model=UserResponse)
-def update_user_partial(user_id: int, user_data: UserUpdate, response: Response):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
-
-    # Obtener usuario existente
-    user = user_service.get_user_by_id(user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"El usuario con ID {user_id} no existe."
-        )
-
-    # Filtrar solo los campos enviados para la actualización parcial
-    update_data = user_data.model_dump(exclude_unset=True)
-    if not update_data:
+    except Exception:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No se enviaron campos para actualizar."
+            detail="No se pudo crear el usuario"
         )
 
-    # Actualizar campos específicos
-    updated_user = user_service.update_user(user_id, {**user, **update_data})
-    return updated_user
 
+@router.put(
+    "/{user_id}",
+    response_model=userResponse
+)
+def actualizar_usuario(
+    user_id: int,
+    usuario_data: userUpdate,
+    db: Session = Depends(get_db)
+):
+    usuario = user_service.obtener_usuario(db, user_id)
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, response: Response):
-    # Agregar cabeceras HTTP personalizadas
-    response.headers["X-App-Name"] = "device_systems"
-    response.headers["X-API-Version"] = "1.0"
-
-    # Validar existencia y eliminar de la base de datos simulada
-    user = user_service.get_user_by_id(user_id)
-    if not user:
+    if usuario is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"El usuario con ID {user_id} no existe."
+            detail="Usuario no encontrado"
         )
 
-    from app.data.users_db import users_db
-    users_db.remove(user)
-    
-    # Retornar respuesta vacía (204 No Content)
+    try:
+        return user_service.actualizar_usuario(db, user_id, usuario_data)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El correo electrónico ya pertenece a otro usuario"
+        )
+
+
+@router.patch(
+    "/{user_id}",
+    response_model=userResponse
+)
+def actualizar_usuario_parcial(
+    user_id: int,
+    usuario_data: userPatch,
+    db: Session = Depends(get_db)
+):
+    usuario = user_service.obtener_usuario(db, user_id)
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+
+    try:
+        return user_service.actualizar_usuario_parcial(db, user_id, usuario_data)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El correo electrónico ya pertenece a otro usuario"
+        )
+
+
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def eliminar_usuario(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    usuario = user_service.eliminar_usuario(db, user_id)
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+
     return None

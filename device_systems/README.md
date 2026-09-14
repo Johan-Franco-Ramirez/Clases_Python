@@ -20,11 +20,12 @@ device_systems/
 ├── requirements.txt         # Dependencias del proyecto
 ├── README.md                # Documentación del proyecto
 │
-└── app/                     # Paquete principal de la aplicación
+├── app/                     # Paquete principal de la aplicación
     ├── main.py              # Punto de entrada de FastAPI y registro de routers
     ├── data/                # Capa de datos simulada en memoria (users_db.py)
     ├── schemas/             # Modelos de validación con Pydantic (user_schema.py)
     └── routes/              # Controladores y endpoints de la API (user_routes.py)
+└──public
 ```
 ---
 # ¿Qué es Pydantic?
