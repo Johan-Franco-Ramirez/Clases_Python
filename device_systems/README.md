@@ -1,203 +1,132 @@
-# 🚀 device_systems API
+# device_systems API - Seguridad y Autenticación
+GA1-220501096-01-AA1-EV11 – FastAPI Seguridad: Autenticación, Middleware, CORS, Rate Limiting y Validación Avanzada.
 
-Aplicación backend desarrollada con **FastAPI** para construir una API REST enfocada en la gestión de usuarios, aplicando validaciones, parámetros de ruta y consulta, modelos de respuesta, operaciones CRUD completas y cabeceras HTTP personalizadas.
-
----
-
-## 📋 Descripción de la aplicación
-`device_systems` es un sistema backend optimizado para administrar de forma limpia y estructurada los perfiles de los usuarios del sistema. Implementa buenas prácticas de desarrollo en capas y control de errores HTTP estándar.
+## 📌 Descripción del Proyecto
+Evolución de la API REST **device_systems** para incorporar una capa de seguridad profesional. El sistema gestiona usuarios, dispositivos tecnológicos y préstamos, integrando autenticación basada en **OAuth2 con JWT**, cifrado seguro de contraseñas con **Passlib (bcrypt)**, control de acceso basado en roles (`admin`, `support`, `user`), validaciones robustas con **Pydantic v2**, middleware de trazabilidad, control de tráfico con **Rate Limiting** y configuración estricta de **CORS**.
 
 ---
 
-## 📂 Estructura del Proyecto
-El proyecto está organizado en una arquitectura modular limpia:
-
+## 🗂️ Estructura del Proyecto
 ```text
 device_systems/
-│
-├── .venv/                   # Entorno virtual de Python
-├── .gitignore               # Archivos ignorados por Git
-├── requirements.txt         # Dependencias del proyecto
-├── README.md                # Documentación del proyecto
-│
-├── app/                     # Paquete principal de la aplicación
-    ├── main.py              # Punto de entrada de FastAPI y registro de routers
-    ├── data/                # Capa de datos simulada en memoria (users_db.py)
-    ├── schemas/             # Modelos de validación con Pydantic (user_schema.py)
-    └── routes/              # Controladores y endpoints de la API (user_routes.py)
-└──public
-```
----
-# ¿Qué es Pydantic?
----
-Pydantic es la librería utilizada por FastAPI para validar y gestionar los datos mediante modelos y tipos de Python.
+├── app/
+│   ├── main.py
+│   ├── auth/
+│   │   ├── auth_routes.py
+│   │   ├── auth_service.py
+│   │   └── security.py
+│   ├── database/
+│   │   └── connection.py
+│   ├── models/
+│   │   ├── user_model.py
+│   │   ├── device_model.py
+│   │   └── loan_model.py
+│   ├── schemas/
+│   │   ├── user_schema.py
+│   │   ├── device_schema.py
+│   │   ├── loan_schema.py
+│   │   └── auth_schema.py
+│   ├── routes/
+│   │   ├── user_routes.py
+│   │   ├── device_routes.py
+│   │   └── loan_routes.py
+│   ├── services/
+│   │   ├── user_service.py
+│   │   ├── device_service.py
+│   │   └── loan_service.py
+│   ├── dependencies/
+│   │   ├── database_dependency.py
+│   │   └── auth_dependency.py
+│   ├── middlewares/
+│   │   └── request_middleware.py
+│   └── utils/
+│       └── limiter.py
+├── alembic/
+│   └── versions/
+├── .env
+├── .env.example
+├── alembic.ini
+├── requirements.txt
+└── README.md
+(Insertar aquí captura de la estructura del proyecto en VS Code)
 
-Permite comprobar automáticamente que los datos enviados por el cliente cumplan las reglas definidas, como el número mínimo de caracteres, tipos de datos y formatos de correo electrónico mediante EmailStr.
+⚙️ Configuración y Ejecución del Entorno
+Cambiar a la rama de seguridad en Git:
 
-Además, FastAPI utiliza estos modelos para generar automáticamente parte de la documentación interactiva disponible en Swagger UI.
+Bash
+git checkout device_systems_security
+Instalar dependencias necesarias:
 
----
-# Instalación y configuración
+Bash
+pip install -r requirements.txt
+Configurar el archivo de variables de entorno (.env):
+Copia el archivo .env.example como .env y define los parámetros de tu base de datos y la llave secreta para los tokens JWT (SECRET_KEY).
 
-1. Crear el entorno virtual
+Aplicar la migración de Alembic para los campos de seguridad:
 
-``python -m venv .venv``
+Bash
+alembic upgrade head
+(Insertar aquí captura de la consola ejecutando la migración de Alembic)
 
-2. Activar el entorno virtual
+Iniciar el servidor local con Uvicorn:
 
-source .venv/Scripts/activate
+Bash
+uvicorn app.main:app --reload
+🔒 Características de Seguridad Implementadas
+Hash de Contraseñas: Uso de passlib con algoritmo bcrypt para garantizar que las credenciales nunca se almacenen ni expongan en texto plano.
 
-3. Instalar las dependencias
+Autenticación OAuth2 & JWT: Emisión de tokens de acceso firmados para validar sesiones de usuario de forma segura.
 
-``pip install -r requirements.txt``
----
-# Ejecución del servidor
----
-Para iniciar el servidor de desarrollo con recarga automática:
+Control de Acceso por Roles (RBAC): Restricción de endpoints basada en los perfiles admin, support y user.
 
-``python -m uvicorn app.main:app --reload``
+Validaciones Avanzadas: Reglas estrictas en Pydantic v2 (longitud mínima de 8 caracteres, inclusión de mayúsculas, minúsculas, números y restricción de espacios en blanco).
 
-Servidor local:
+🌐 Configuración de CORS
+En el archivo main.py se implementó CORSMiddleware restringiendo los orígenes permitidos a los clientes de desarrollo autorizados:
 
-http://127.0.0.1:8000
- Documentación automática
+http://localhost:5173
 
-Swagger UI:
+http://localhost:3000
 
-http://127.0.0.1:8000/docs
+¿Por qué no se recomienda usar "*" en producción con credenciales?
+Utilizar un comodín allow_origins=["*"] en conjunto con allow_credentials=True introduce un riesgo crítico de seguridad. Los navegadores modernos bloquean automáticamente peticiones con credenciales (como tokens Bearer) si el servidor acepta cualquier origen de forma indiscriminada, evitando que sitios web maliciosos secuestren sesiones activas de los usuarios.
 
-ReDoc:
+📸 Evidencias de Pruebas Funcionales
+Registro de Usuario Válido:
 
-http://127.0.0.1:8000/redoc
----
-# Endpoints
+(Insertar captura de pantalla del registro exitoso en Swagger/Postman)
 
-| Método | Endpoint | Descripción | Parámetros |
-|---|---|---|---|
-| `GET` | `/users` | Lista todos los usuarios. | `role`, `is_active` *(Query opcionales)* |
-| `GET` | `/users/{user_id}` | Consulta un usuario específico. | `user_id` *(Path)* |
-| `POST` | `/users` | Registra un nuevo usuario. | `Body: UserCreate` |
-| `PUT` | `/users/{user_id}` | Actualiza completamente un usuario. | `user_id` *(Path)* + `Body: UserCreate` |
-| `PATCH` | `/users/{user_id}` | Actualiza parcialmente un usuario. | `user_id` *(Path)* + `Body: UserUpdate` |
-| `DELETE` | `/users/{user_id}` | Elimina un usuario existente. | `user_id` *(Path)* |
+Registro con Contraseña Débil (Validación Pydantic):
 
-Parámetros
-``user_id``: Path Parameter utilizado para identificar un usuario.
+(Insertar captura del error 422 Unprocessable Entity)
 
-``role``: Query Parameter para filtrar por admin, support o user.
+Login y Generación de Token JWT:
 
-``is_active``: Query Parameter para filtrar usuarios activos o inactivos.
----
-# Ejemplos de peticiones
+(Insertar captura del endpoint /auth/login retornando el access_token)
 
-1. Registrar un usuario
+Consulta de Perfil Protegido (/auth/me):
 
-POST /users
+(Insertar captura de la respuesta con los datos del usuario sin exponer hashed_password)
 
+Acceso sin Token a Ruta Protegida:
 
-{
+(Insertar captura de la respuesta HTTP 401 Unauthorized)
 
-    "name": "Dante",
-    "email": "dantei@example.com",
-    "role": "support",
-    "is_active": false
-}
+Acceso con Rol No Permitido:
 
-Respuesta esperada:
+(Insertar captura de la respuesta HTTP 403 Forbidden al intentar ejecutar una acción exclusiva de admin)
 
-201 Created
+Documentación Swagger / OpenAPI con OAuth2:
 
-{
+(Insertar captura de Swagger UI mostrando los candados de seguridad)
 
-    "name": "Dante",
-    "email": "dantea@example.com",
-    "role": "support",
-    "is_active": false,
-    "id": 4
-}
---
-2. Consultar usuarios filtrados
+Cabeceras del Middleware Personalizado:
 
-GET ``/users?role=admin``
+(Insertar captura de las headers X-App-Name, X-Process-Time y X-Request-ID)
 
-Este endpoint devuelve únicamente los usuarios cuyo rol corresponde a admin.
+Activación de Rate Limiting:
 
-También es posible filtrar por estado:
+(Insertar captura de la respuesta HTTP 429 Too Many Requests tras superar el límite de peticiones)
 
-GET ``/users?is_active=true``
-
-La API incluye las siguientes cabeceras personalizadas:
-
-X-App-Name: device_systems
-X-API-Version: 1.0
- Validaciones y manejo de errores
-
-La API valida los datos recibidos mediante Pydantic y controla diferentes situaciones de error.
-
-Entre ellas:
-
--Usuario inexistente.
-
--Correo electrónico duplicado.
-
--Rol no permitido.
-
--Datos inválidos.
-
--Intentos de actualización sobre usuarios inexistentes.
-
--Eliminación de usuarios inexistentes.
-
--Solicitudes PATCH sin datos para actualizar.
-
-Los errores utilizan códigos HTTP apropiados para comunicar correctamente el resultado de cada operación.
----
-##  Códigos de estado HTTP
-
-| Código | Nombre | Uso en `device_systems` |
-|---:|---|---|
-| `200` | OK | Operación realizada correctamente. |
-| `201` | Created | Usuario creado correctamente mediante `POST`. |
-| `204` | No Content | Usuario eliminado correctamente sin devolver contenido. |
-| `400` | Bad Request | Solicitud incorrecta, como correo duplicado o `PATCH` vacío. |
-| `404` | Not Found | El usuario solicitado no existe. |
-| `422` | Unprocessable Entity | Los datos enviados no cumplen las validaciones de Pydantic. |
-
-# Evidencias
-
-
-Swagger UI (/docs).
-![Imagen1](public/SwaggerUI.png)
-
-ReDoc (/redoc).
-![Imagen2](public/RedocIU.png)
-
-GET /users.
-![Imagen3](public/Users.png)
-![Imagen4](public/UsersDiccionario.png)
-![Imagen4](public/UserAdminTrue.png)
-
-GET /users/{user_id}.
-![Imagen5](public/UsersID.png)
-
-POST /users.
-![Imagen6](public/UsersPost.png)
-
-PUT /users/{user_id}.
-![Imagen7](public/UsersPUT.png)
-
-PATCH /users/{user_id}.
-![Imagen8](public/UsersPATCH.png)
-
-DELETE /users/{user_id}.
-![Imagen9](public/UsersDELETE.png)
-
----
-# Reflexión sobre FastAPI
----
-El uso de FastAPI facilita la construcción de APIs REST gracias al tipado de Python, la validación automática mediante Pydantic y la generación de documentación interactiva. Esto permite desarrollar aplicaciones más organizadas, reducir código repetitivo y detectar errores en los datos enviados por los clientes.
-
-La evolución de device_systems permitió pasar de una API básica con operaciones GET y POST a una solución con CRUD completo, manejo de errores, códigos de estado HTTP, documentación automática y separación de responsabilidades.
-
----
-# Johan Franco R. ADSO
+💡 Reflexión Final
+La incorporación de mecanismos avanzados de seguridad en una API REST representa un estándar indispensable en el desarrollo de software moderno. El uso de autenticación basada en tokens JWT, cifrado seguro con bcrypt, control estricto de roles y limitación de tráfico protege de manera integral los datos del sistema frente a ataques informáticos comunes como la fuerza bruta o la suplantación de identidad, preparando la aplicación para despliegues reales en entornos de producción empresariales.

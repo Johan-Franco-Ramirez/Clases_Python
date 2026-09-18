@@ -10,6 +10,7 @@ def obtener_usuarios(
     is_active: Optional[bool] = None,
     name: Optional[str] = None,
     email: Optional[str] = None,
+    hashed_password: Optional[str] = None,
     sort_by: Optional[str] = None,
     order: str = "asc"
 ):
@@ -26,6 +27,9 @@ def obtener_usuarios(
 
     if email is not None:
         query = query.filter(user.email.ilike(f"%{email}%"))
+
+    if hashed_password is not None:
+        query = query.filter(user.hashed_password == hashed_password)
 
     if sort_by in ["name", "created_at"]:
         column = getattr(user, sort_by)
